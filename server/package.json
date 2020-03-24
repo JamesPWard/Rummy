@@ -1,0 +1,25 @@
+{
+  "name": "rummy",
+  "version": "1.0.0",
+  "description": "A game of Rummy built on Node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JamesPWard/Rummy.git"
+  },
+  "author": "James Ward",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JamesPWard/Rummy/issues"
+  },
+  "homepage": "https://github.com/JamesPWard/Rummy#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "socket.io": "^2.3.0",
+    "vue": "^2.6.11"
+  }
+}
