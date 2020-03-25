@@ -1,6 +1,6 @@
 <template>
     <div>
-        <img v-if="type == 'BACK'" style="max-width:100%;" src="../assets/cards/2B.svg" alt=""/>
+        <img v-if="type == 'BACK'" src="../assets/cards/2B.svg" alt=""/>
 
         <img v-else-if="type == 'AC'" style="max-width:100%;" src="../assets/cards/AH.svg" alt=""/>
         <img v-else-if="type == 'AD'" style="max-width:100%;" src="../assets/cards/AS.svg" alt=""/>
@@ -69,9 +69,12 @@
     </div>
 </template>
 <style scoped>
-    .card{
-        font-size: 2rem;
+
+    img{
+        height: 100%;
+        width: 100%;
     }
+
 </style>
 <script>
 export default {

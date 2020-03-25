@@ -1,10 +1,12 @@
 <template>
-  <div class="hello">
+  <div>
+	<div class="side-draw">
+		test
+	</div>
     <div class="container">
 		<section class="oponent">
-			<h3>Oponent</h3>
 			<section class="op-cards">
-				<Card  v-bind:key="item" v-for="item in opdeck" :type="item"/>
+				<Card class="small-card" v-bind:key="index" v-for="(item, index) in opdeck" :type="item"/>
 			</section>
 		</section>
 		<section class="stack">
@@ -20,23 +22,22 @@
 		</section>
 		<section class="current-cards">
 			<draggable class="cards"  v-model="deck" group="deck" @start="drag=true" @end="drag=false">
-					<Card class="card" v-bind:key="item" v-for="item in deck" :type="item"/>
+					<Card class="card" v-bind:key="index" v-for="(item, index) in deck" :type="item"/>
 			</draggable>
 		</section>
-
-		<section class="controls">
-
-			<button class="draw-card">Draw</button>
-
-			<button class="draw-card">Hold</button>
-
+		<section class="disabled-container">
+			<h1 class="op-turn">Oponents Turn</h1>
+			<div class="disabled"></div>
 		</section>
-
+		<section class="controls">
+			<button v-on:click="toggleDisable()" class="draw-card">Draw</button>
+			<button class="draw-card">Hold</button>
+		</section>
     </div>
   </div>
 </template>
 <script>
-  import io from "socket.io-client";
+//   import io from "socket.io-client";
   import Card from "./Card.vue";
   import draggable from 'vuedraggable';
 
@@ -50,18 +51,36 @@
 			deck: ['JC','4H','5H','2C','9H','QC','KC'],
 			opdeck: ['BACK', 'BACK', 'BACK', 'BACK', 'BACK', 'BACK', 'BACK'],
 			socket: {},
+			settings:{
+				controlsDisabled: false,
+			},
 		}
 	},
 	created(){
 		console.log('test');
-		this.socket = io("http://localhost:3000");
+		// this.socket = io("http://localhost:3000");
 	},
 	mounted() {
-		this.socket.on("position", data => {
-			console.log(data);
-		});
+		// this.socket.on("position", data => {
+		// 	console.log(data);
+		// });
 	},
 	methods: {
+
+		toggleDisable(){
+
+			if(!this.settings.controlsDisabled){
+				document.getElementsByClassName('disabled-container')[0].style.visibility = "visible";
+				this.settings.controlsDisabled = true;
+			}else{
+				document.getElementsByClassName('disabled-container')[0].style.visibility = "hidden";
+				this.settings.controlsDisabled = false;
+			}
+
+			console.log(this.settings.controlsDisabled);
+			console.log(document.getElementsByClassName('disabled-container')[0].visibility);
+		}
+
 	}
   }
 </script>
@@ -70,35 +89,66 @@
 	*{
 		font-family: 'Poppins', sans-serif;
 	}
-	
+
+	.side-draw{
+		transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
+		width: 50%;
+		height: 100vh;
+		background: green;
+		left: 50%;
+		position: absolute;
+	}
+
+	.disabled-container{
+		visibility: hidden;
+	}
+	.disabled {
+		width: 100%;
+		height:100%;
+		z-index: 99;
+		background: #000;
+		opacity: 0.75;
+		position: absolute;
+	}
+	.op-turn{ 
+		color: white;
+		font-size: 2rem;
+		font-weight: 800;
+		position: absolute;
+		z-index: 100;
+		width: 100%;		
+		height: 10%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	.container {
 		background: #fff;
 		width: 100vw;
 		height: 100vh;
+		left: -40%;
+		position: relative;
 	}
 
 	/* Oponent */
-	.oponent h3{
-		width: 100%;
-		height: 25px;
-		text-align: center;
-		color: white;
-		padding-top: 2.5%;
-		font-weight: 400;
-	}
-
 	.oponent{
 		background: #485C73;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		height: 17%;
+		justify-content: center;
+		height: 12%;
 	}
 
 	.op-cards{
 		display: flex;
 		width: 90%;
 		justify-content: space-evenly;
+	}
+
+	.small-card{
+		margin: 0.5%;
 	}
 
 	.hr{
@@ -126,9 +176,6 @@
 
 	.cards-current{
 		width: 150px;
-		height: 200px;
-		border-radius: 5px;
-		background: white;
 		margin: 0 5%;
 	}
 
@@ -142,7 +189,7 @@
 	/* Play field */
 	.current-cards{
 		background: #295B96;
-		height: 40%;
+		height: 45%;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
@@ -174,15 +221,15 @@
 	}
 
 	.draw-card{
-		width: 40%;
+		width: 45%;
 		height: 75%;
 		color: white;
-		background: rgba(0, 0, 0, 0.5);
-		border-radius: 5px;
-		border: 0;
+		background: rgba(0, 0, 0, 0.25);
+		border-radius: 0px;
+		border: 1px solid rgba(0, 0, 0, 0.5);
+		border-radius: 3px;
 		font-weight: 800;
-		font-size: 2rem;
-		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+		font-size: 1rem;
+		box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.5);
 	}
-
 </style>
