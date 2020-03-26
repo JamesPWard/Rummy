@@ -8,16 +8,7 @@ const fs = require('fs');
 let port = 3000;
 
 //Game variables
-let gameList = [{
-    id: 0,
-    players: [],
-    deck: {
-        remaining: [],
-        discarded: [],
-        p1: [],
-        p2: [],
-    }
-}];
+let gameList = [];
 let deckDefault = [
     "2C", "2D", "2H", "2S",
     "3C", "3D", "3H", "3S",
@@ -35,18 +26,15 @@ let deckDefault = [
 ];
 
 function generateDeck(index){
-
     //Include all cards into game deck and shuffle
     gameList[index].deck.remaining = deckDefault;
 
-    //Get player 1 cards
+    //Get player 1 and 2 cards
     gameList[index].deck.p1 = gameList[index].deck.remaining.splice(0, 7);
+    gameList[index].deck.p2 = gameList[index].deck.remaining.splice(0, 7);
 
     console.log(gameList[index]);
-
 }
-
-generateDeck(0);
 
 function shuffle(array){
     array.sort(() => Math.random() - 0.5);
@@ -109,15 +97,19 @@ io.on('connection', (socket) => {
             gameList[gameIndex].players.push(settings.username);
             console.log('PLAYER 2 JOINED! Start game...');
 
-            io.in(settings.gameId).emit('beginGame', 'TEST!!!');
+            generateDeck(gameIndex);
+
+            io.in(settings.gameId).emit('beginGame', gameList[gameIndex]);
         }
 
-        console.log(gameList[gameIndex].players);
         console.log(gameList[gameIndex]);
 
         //Connect to room
 
     });
+
+    // socket.on('startGame', )
+
 
     console.log('User connected');
 });
