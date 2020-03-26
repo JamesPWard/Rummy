@@ -1,8 +1,10 @@
 <template>
   <div>
-	<div class="side-draw">
+	<!-- <div class="side-draw">
 		test
-	</div>
+	</div> -->
+	<main-menu setting="menu" v-if="!this.settings.inGame" />
+	<main-menu setting="waiting" v-else-if="this.settings.inGame && this.settings.waiting" />
     <div class="container">
 		<section class="oponent">
 			<section class="op-cards">
@@ -36,15 +38,17 @@
     </div>
   </div>
 </template>
+
 <script>
-//   import io from "socket.io-client";
+  import io from "socket.io-client";
   import Card from "./Card.vue";
   import draggable from 'vuedraggable';
+  import MainMenu from './MainMenu.vue'
 
   export default {
 	name: 'Game',
 	components:{
-		Card, draggable
+		Card, draggable, MainMenu
 	},
 	data() {
 		return {
@@ -52,20 +56,62 @@
 			opdeck: ['BACK', 'BACK', 'BACK', 'BACK', 'BACK', 'BACK', 'BACK'],
 			socket: {},
 			settings:{
+				gameId: '',
+				username: '',
 				controlsDisabled: false,
+				inGame: false,
+				waiting: false,
 			},
 		}
 	},
 	created(){
-		console.log('test');
-		// this.socket = io("http://localhost:3000");
+		//Check if player is trying to join
+		let gameid = window.location.search.substr(1);
+		
+		this.socket = io("http://localhost:3000");
+
+		if(gameid != ''){
+			this.settings.username = prompt('Enter username');
+			this.settings.inGame = true;
+			this.settings.gameId = gameid;
+
+			console.log(this.settings);
+			
+			this.socket.emit('joinGame', this.settings);
+			console.log('joining game ' + gameid);
+			
+		}else{
+			console.log('Normal Session');
+		}
+
 	},
 	mounted() {
-		// this.socket.on("position", data => {
-		// 	console.log(data);
-		// });
+
+		this.socket.on('beginGame', (msg) => {
+			//Remove hud elements
+			console.log(msg);
+
+			this.settings.inGame = true;
+			this.settings.waiting = false;
+		});
+
+		this.socket.on('waitForOponent', (id) => {
+			this.settings.inGame = true;
+			this.settings.gameId = id;
+			this.socket.emit('joinGame', this.settings);
+
+			//Wait for player to join then emit joined
+
+		});
 	},
 	methods: {
+
+		createGame(){
+			this.settings.username = prompt('Enter username');
+			console.log('Requested new game...');
+			this.settings.waiting  = true;
+			this.socket.emit('requestGame', this.settings);
+		},
 
 		toggleDisable(){
 
@@ -85,10 +131,6 @@
   }
 </script>
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
-	*{
-		font-family: 'Poppins', sans-serif;
-	}
 
 	.side-draw{
 		transition: transform 0.6s cubic-bezier(0.76, 0, 0.24, 1);
@@ -104,7 +146,7 @@
 	}
 	.disabled {
 		width: 100%;
-		height:100%;
+		height:10%;
 		z-index: 99;
 		background: #000;
 		opacity: 0.75;
@@ -127,7 +169,7 @@
 		background: #fff;
 		width: 100vw;
 		height: 100vh;
-		left: -40%;
+		/* left: -40%; */
 		position: relative;
 	}
 
